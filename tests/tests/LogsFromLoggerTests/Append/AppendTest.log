@@ -1,0 +1,8 @@
+[info] [2019-12-14 00:26:37] Logger start. Log file: tests/LogsFromLoggerTests/Append/AppendTest.log.
+[alert] FileLoggerTest v 1576279597
+[info] [2019-12-14 00:27:17] Logger start. Log file: tests/LogsFromLoggerTests/Append/AppendTest.log.
+[alert] FileLoggerTest v 1576279637
+[info] [2019-12-18 13:59:00] Logger start. Log file: tests/LogsFromLoggerTests/Append/AppendTest.log.
+[alert] FileLoggerTest v 1576673940
+[info] [2019-12-18 15:17:09] Logger start. Log file: tests/LogsFromLoggerTests/Append/AppendTest.log.
+[alert] FileLoggerTest v 1576678629
