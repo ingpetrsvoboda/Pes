@@ -11,7 +11,7 @@
 
 namespace Pes\View\Template;
 
-use Pes\View\Renderer\NodeRenderer;
+use Pes\View\Renderer\NodeRenderer as DefaultRenderer;
 
 use Pes\Dom\Node\NodeInterface;
 
@@ -37,7 +37,7 @@ class NodeTemplate implements NodeTemplateInterface {
      * @return string
      */
     public function getDefaultRendererService() {
-        return NodeRenderer::class;
+        return DefaultRenderer::class;
     }
 
 }

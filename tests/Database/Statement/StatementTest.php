@@ -58,6 +58,8 @@ class StatementTest extends TestCase {
 //        $this->logger = new NullLogger();
 //        $this->attributesProviderDefault = new AttributesProviderDefault($this->logger);
 
+        $baseLogsDir="_logs/";
+        FileLogger::setBaseLogsDirectory($baseLogsDir);
     }
 
     /**
@@ -98,8 +100,8 @@ class StatementTest extends TestCase {
 //    }
 
     public function testStatementWithFileLogger() {
-        $dir = 'Pes/tests/Logs/LogsFromStatementTests';
-        $file = 'TestStatement.log';
+        $dir = 'LogsFromStatementTests/';
+        $file = get_called_class().'.log';
         $logger = FileLogger::getInstance($dir, $file, FileLogger::REWRITE_LOG);
 
         $user = new Account(self::USER, self::PASS);

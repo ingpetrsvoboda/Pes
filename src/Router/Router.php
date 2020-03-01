@@ -11,6 +11,7 @@ use Psr\Http\Message\ResponseInterface;
 use Pes\Application\AppFactory;
 use Pes\Application\UriInfoInterface;
 
+use Pes\Action\ResourceInterface;
 /**
  * Description of Router
  *
@@ -46,17 +47,27 @@ class Router implements RouterInterface, LoggerAwareInterface {
      */
     private $request;
 
+    private $urlPatternValidator;
+
+    public function __construct(UrlPatternValidator $urlPatternValidator) {
+        $this->urlPatternValidator = $urlPatternValidator;
+    }
+
     public function setLogger(LoggerInterface $logger) {
         $this->logger = $logger;
     }
+
     /**
      *
-     * @param string $method Existující hodnota výčtového typu MethodEnum.
-     * @param string $urlPattern URL pattern
+     * @param ResourceInterface $resource
      * @param callable $action
+     * @param type $name
      */
-    public function addRoute($method, $urlPattern, callable $action, $name=''){
-        $route = (new Route())->setMethod($method)->setUrlPattern($urlPattern)->setAction($action);
+    public function addRoute(ResourceInterface $resource, callable $action, $name=''){
+        $method = $resource->getHttpMethod();
+        $urlPattern = $resource->getUrlPattern();
+        $route = (new Route($this->urlPatternValidator))->setMethod($method)->setUrlPattern($urlPattern)->setAction($action);
+
         // přidání routy do pole rout - první index pole je metoda, druhý index pole je druhý znak url
         //  - očekávám, že druhý znak pattern bude stejný -> selže, pokud pattern začíná parametrem (první znak je dvojtečka),
         // například /:id/ (pak url je /2/ nebo /1234/ atd.) - takový pattern je nesmyslný pro REST
@@ -90,12 +101,12 @@ class Router implements RouterInterface, LoggerAwareInterface {
      *
      * @param ServerRequestInterface $request
      * @return type
-     * @throws \UnexpectedValueException
+     * @throws RouteNotFoundException
      */
     public function route(ServerRequestInterface $request) {
         $response = $this->applyRouting($request);
         if (!$response) {
-            throw new \UnexpectedValueException("Nenalezena route pro method: {$request->getMethod()}, path: {$request->getUri()->getPath()}");
+            throw new RouteNotFoundException("Route not found for method: {$request->getMethod()}, path: {$request->getUri()->getPath()}");
         }
         return $response;
     }
@@ -103,7 +114,10 @@ class Router implements RouterInterface, LoggerAwareInterface {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface {
         $response = $this->applyRouting($request);
         if (!$response) {
-            return $handler->handle($request);
+            $response = $handler->handle($request);
+            if (!$response) {
+                throw new RouteNotFoundException("Route not found for method: {$request->getMethod()}, path: {$request->getUri()->getPath()}");
+            }
         }
         return $response;
     }
@@ -122,7 +136,9 @@ class Router implements RouterInterface, LoggerAwareInterface {
 
                 if(preg_match($route->getPatternPreg(), $restUri, $matches)) {
                     // odstraní první prvek $matches - $matches je pole, pro uri "/node/18856/add/" první prvek polek obsahuje "/node/18856/add/", druhý obsahuje parametr "18856"
-                    array_shift($matches);
+                    // jako první prvek matches vloží $request -> první parametr předaný volané akci routy je pak $request
+//                    array_shift($matches);
+                    $matches[0] =$request;
 
                     $this->request = $request;
                     $this->matchedRoute = $route;
@@ -138,23 +154,30 @@ class Router implements RouterInterface, LoggerAwareInterface {
 
     private function callAction(Route $route, $parameters) {
         $action = $route->getAction();
+
 //        // bind container
 //        $action = $this->bindToContainer($route->getAction());
 
         if ($this->logger) {
-            $this->logger->debug("Router: Nalezena route - method: {method}, url: {url}", ['method'=>$route->getMethod(), 'url'=>$route->getUrlPattern()]);
-            $this->logger->debug("Router: Volá se {actionType} s parametry {parameters}", ['actionType'=> $this->getDebugType($action), 'parameters'=>print_r($parameters, TRUE)]);
-
+            $this->logBefore($route, $action, $parameters);
             $ret = call_user_func_array($action, $parameters);
-
-            if($ret===FALSE) {
-                $this->logger->debug("Router: Akce routy nevrátila návratovou hodnotu.");
-            } else {
-                $this->logger->debug("Router: Akce routy vrátila: {retType}", ['retType'=> $this->getDebugType($ret)]);
-                return $ret;
-            }
+            $this->logAfter($ret);
         } else {
-            return call_user_func_array($action, $parameters);
+            $ret = call_user_func_array($action, $parameters);
+        }
+        return $ret;
+    }
+
+    private function logBefore($route, $action, $parameters) {
+        $this->logger->debug("Router: Nalezena route - method: {method}, url: {url}", ['method'=>$route->getMethod(), 'url'=>$route->getUrlPattern()]);
+        $this->logger->debug("Router: Volá se {actionType} s parametry {parameters}", ['actionType'=> $this->getDebugType($action), 'parameters'=>print_r($parameters, TRUE)]);
+    }
+
+    private function logAfter($ret) {
+        if($ret===FALSE) {
+            $this->logger->debug("Router: Akce routy nevrátila návratovou hodnotu.");
+        } else {
+            $this->logger->debug("Router: Akce routy vrátila: {retType}", ['retType'=> $this->getDebugType($ret)]);
         }
     }
 

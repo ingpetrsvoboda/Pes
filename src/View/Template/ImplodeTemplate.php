@@ -11,7 +11,9 @@
 
 namespace Pes\View\Template;
 
-use Pes\View\Renderer\ImplodeRenderer;
+use Pes\View\Renderer\ImplodeRendererInterface;
+
+use Pes\View\Renderer\ImplodeRenderer as DefaultRenderer;
 
 /**
  *
@@ -33,6 +35,6 @@ class ImplodeTemplate implements ImplodeTemplateInterface {
     }
 
     public function getDefaultRendererService() {
-        return ImplodeRenderer::class;
+        return DefaultRenderer::class;
     }
 }

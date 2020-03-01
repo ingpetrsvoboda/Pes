@@ -9,8 +9,12 @@ use Pes\Logger\FileLogger;
  * @author pes2704
  */
 class FileLoggerTest extends TestCase {
+    public function setUp():void {
+
+    }
+
     public function testGetInstanceAndLog() {
-        $baseLogsDir="tests/";
+        $baseLogsDir="_logs/";
         $dirRew = 'LogsFromLoggerTests/Rewrite';
         $fileRew = 'RewriteTest.log';
         $dirRewDel = 'LogsFromLoggerTests/RewriteAndDelete';
@@ -23,6 +27,7 @@ class FileLoggerTest extends TestCase {
             $succ = unlink("$dirRew/$fileRew");
             $succ = rmdir($dirRew);
         }
+
         // base
         FileLogger::setBaseLogsDirectory($baseLogsDir);
 

@@ -11,14 +11,17 @@
 
 namespace Pes\Validator;
 
+use Pes\Validator\Exception\NotArrayKeyException;
+
 /**
- * IsStringValidator ověřuje jestli parametr je string nebo přetypovatelný na string.
+ * IsStringValidator ověřuje jestli parametr je string nebo integer (přetypovatelný na string.
  *
  * @author pes2704
  */
 class IsArrayKeyValidator implements ValidatorInterface {
-    public function isValid($param) {
-        $ret = (is_string($param) OR is_integer($param)) ? TRUE : FALSE;
-        return $ret;
+    public function validate($param):void {
+        if ( !is_string($param) AND !is_integer($param)) {
+            throw new NotArrayKeyException("Value is not valid array key.");
+        }
     }
 }

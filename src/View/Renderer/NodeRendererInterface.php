@@ -11,20 +11,12 @@
 
 namespace Pes\View\Renderer;
 
+use Pes\View\Template\NodeTemplateInterface;
+
 /**
  *
  * @author pes2704
  */
-interface NodeRendererInterface {
-    /**
-     * Přijímá separator, sodnotu. která bude vložena mezi jendotlivé vyrenderované tagy.
-     */
-    public function setSeparator($separator);
+interface NodeRendererInterface extends TemplateRendererInterface {
 
-    /**
-     * Data se nijak nezpracovávají!!
-     * @param type $data
-     * @return string
-     */
-    public function render(NodeTemplateInterface $template, $data=NULL);
 }

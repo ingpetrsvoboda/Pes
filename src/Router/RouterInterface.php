@@ -16,6 +16,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
+use Pes\Action\ResourceInterface;
 
 /**
  *
@@ -23,8 +24,13 @@ use Psr\Http\Message\ResponseInterface;
  */
 interface RouterInterface extends MiddlewareInterface {
 
-    public function addRoute($method, $url, callable $action);
-
+    /**
+     *
+     * @param ResourceInterface $resource
+     * @param callable $action
+     * @param type $name
+     */
+    public function addRoute(ResourceInterface $resource, callable $action, $name='');
     public function route(ServerRequestInterface $request);
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface;
 

@@ -38,11 +38,6 @@ interface RouteInterface {
     public function getAction();
 
     /**
-     * @return string Path se zadanými parametry.
-     */
-    public function getPathFor(array $params);
-
-    /**
      *
      * @param string $method
      */

@@ -7,10 +7,10 @@ namespace Pes\Validator;
  */
 interface ValidatorInterface {
     /**
-     * 
+     *
      * @param type $param
-     * $return boolean 
+     * $return void
      */
-    public function isValid($param);
-    
+    public function validate($param): void;
+
 }

@@ -12,14 +12,16 @@
 namespace Pes\Validator;
 
 /**
- * IsSerializableValidator ověčuje zda parametr je jistě serializovatelný. 
+ * IsSerializableValidator ověčuje zda parametr je jistě serializovatelný.
  * Za serializovatelné jsou považovány všechny PHP typy mimo resource a callable (Closure)
  * a objekty pouze v případě, že implementují rozhraní Serializable.
  *
  * @author pes2704
  */
 class IsSerializableValidator implements ValidatorInterface {
-    public function isValid($param) {
-        return ( !(is_callable($param) OR is_resource($param) OR is_object($param)) OR (is_object($param) AND $param instanceof \Serializable)) ? TRUE : FALSE; 
+    exception
+
+    public function validate($param) {
+        return ( !(is_callable($param) OR is_resource($param) OR is_object($param)) OR (is_object($param) AND $param instanceof \Serializable)) ? TRUE : FALSE;
     }
 }

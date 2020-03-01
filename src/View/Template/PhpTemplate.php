@@ -11,7 +11,7 @@
 
 namespace Pes\View\Template;
 
-use Pes\View\Renderer\PhpTemplateRenderer;
+use Pes\View\Renderer\PhpTemplateRenderer as DefaultRenderer;
 
 /**
  * PhpTemplate.
@@ -25,6 +25,6 @@ class PhpTemplate extends FileTemplateAbstract implements PhpTemplateInterface {
      * @return string
      */
     public function getDefaultRendererService() {
-        return PhpTemplateRenderer::class;
+        return DefaultRenderer::class;
     }
 }

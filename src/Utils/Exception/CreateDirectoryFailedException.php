@@ -16,5 +16,5 @@ namespace Pes\Utils\Exception;
  *
  * @author pes2704
  */
-class CreateDirectoryFailedException extends InvalidArgumentException {
+class CreateDirectoryFailedException extends \InvalidArgumentException implements UtilsExceptionInterface {
 }

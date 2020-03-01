@@ -14,12 +14,12 @@ class IsArrayKeyValidatorTest extends TestCase {
     public function testIsValid() {
         // klíč pole může být integer nebo string
         $validator = new IsArrayKeyValidator();
-        $this->assertTrue($validator->isValid('asdfghjkl'));
-        $this->assertTrue($validator->isValid(321321));
-        $this->assertTrue($validator->isValid(''));
-        $this->assertFalse($validator->isValid([654]));
-        $this->assertFalse($validator->isValid(new stdClass()));
-        $this->assertFalse($validator->isValid(FALSE));
-        $this->assertFALSE($validator->isValid(NULL));
+        $this->assertTrue($validator->validate('asdfghjkl'));
+        $this->assertTrue($validator->validate(321321));
+        $this->assertTrue($validator->validate(''));
+        $this->assertFalse($validator->validate([654]));
+        $this->assertFalse($validator->validate(new stdClass()));
+        $this->assertFalse($validator->validate(FALSE));
+        $this->assertFALSE($validator->validate(NULL));
     }
 }

@@ -40,11 +40,11 @@ class IsObjectTypeValidatorTest extends TestCase {
     
     public function testIsValid() {
         $validator = new IsObjectTypeValidator('ObjectForIsTypeValidatorTest');      
-        $this->assertTrue($validator->isValid(new ObjectForIsTypeValidatorTest()));
-        $this->assertFalse($validator->isValid(new AnotherObjectForIsTypeValidatorTest()));
+        $this->assertTrue($validator->validate(new ObjectForIsTypeValidatorTest()));
+        $this->assertFalse($validator->validate(new AnotherObjectForIsTypeValidatorTest()));
         $validator = new IsObjectTypeValidator('InterfaceForIsTypeValidatorTest');      
-        $this->assertTrue($validator->isValid(new InterfacedObjectForIsTypeValidatorTest()));
-        $this->assertFalse($validator->isValid(new AnotherObjectForIsTypeValidatorTest()));    }
+        $this->assertTrue($validator->validate(new InterfacedObjectForIsTypeValidatorTest()));
+        $this->assertFalse($validator->validate(new AnotherObjectForIsTypeValidatorTest()));    }
     
     
 }

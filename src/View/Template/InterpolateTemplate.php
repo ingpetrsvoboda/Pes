@@ -11,7 +11,7 @@
 
 namespace Pes\View\Template;
 
-use Pes\View\Renderer\InterpolateRenderer;
+use Pes\View\Renderer\InterpolateRenderer as DefaultRenderer;
 
 /**
  * PhpTemplate.
@@ -38,7 +38,7 @@ class InterpolateTemplate extends FileTemplateAbstract implements InterpolateTem
      * @return string
      */
     public function getDefaultRendererService() {
-        return InterpolateRenderer::class;
+        return DefaultRenderer::class;
     }
 
     public function getLeftBracket() {

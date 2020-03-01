@@ -47,7 +47,7 @@ class TemplateRendererContainer implements TemplateRendererContainerInterface {
 
     private static function create($className) {
         if (!class_exists($className, TRUE)) {
-            throw new RendererNotExistsException("Neexistuje požadovaná třída default rendereru: $className.");
+            throw new RendererNotExistsException("Neexistuje požadovaná třída default rendereru: $className v kontejneru ".__CLASS__.".");
         }
         $renderer = new $className();
         if ($renderer instanceof RendererRecordableInterface AND isset(self::$recorderProvider)) {

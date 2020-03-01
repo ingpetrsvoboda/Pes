@@ -16,6 +16,8 @@ use Pes\View\Renderer\TemplateRendererInterface;
 use Pes\View\Renderer\Container\TemplateRendererContainer;
 use Pes\View\Template\TemplateInterface;
 
+use Psr\Container\ContainerInterface;
+
 /**
  * use použit jako definice fallback rendereru - použit pro renderování, pokud nebyla zadána žádná šablona a tedy není znám default renderer šablony.
  */
@@ -42,8 +44,21 @@ class View implements ViewInterface {
      */
     protected $template;
 
-    public function getRenderer(): RendererInterface {
-        return $this->renderer;
+    /**
+     * @var ContainerInterface
+     */
+    protected $rendererContainer;
+
+    protected $rendererName;
+
+    /**
+     * Lze nastavit data pro renderování. Tato data budou použita metodou render().
+     * @param type $data
+     * @return ViewInterface
+     */
+    public function setData($data=NULL): ViewInterface {
+        $this->data = $data;
+        return $this;
     }
 
     /**
@@ -56,15 +71,21 @@ class View implements ViewInterface {
         return $this;
     }
 
-    /**
-     * Lze nastavit data pro renderování. Tato data budou použita metodou render().
-     * @param type $data
-     * @return ViewInterface
-     */
-    public function setData($data=NULL): ViewInterface {
-        $this->data = $data;
+    public function setRendererContainer(ContainerInterface $rendererContainer): ViewInterface {
+        $this->rendererContainer = $rendererContainer;
         return $this;
     }
+
+    /**
+     *
+     * @param $rendererName
+     * @return ViewInterface
+     */
+    public function setRendererName($rendererName): ViewInterface {
+        $this->rendererName = $rendererName;
+        return $this;
+    }
+
 
     /**
      * Nastaví template objekt pro renderování. Tato template bude použita metodou render().
@@ -107,38 +128,9 @@ class View implements ViewInterface {
     public function getString($data=NULL) {
         $this->resolveRenderer();
         if ($this->renderer instanceof TemplateRendererInterface) {
-            return $this->renderer->render($this->template, $data ?? $this->data);
-        } else {
-            return $this->renderer->render($data ?? $this->data);
+            $this->renderer->setTemplate($this->template);
         }
-    }
-
-    private function resolveRenderer() {
-        if (isset($this->renderer)) {
-            if (isset($this->template)) {
-                $templateDefaultRendererClass = $this->template->getDefaultRendererService();
-                if ( !($this->renderer instanceof $templateDefaultRendererClass)) {
-                    throw new \UnexpectedValueException("Zadaný renderer ". get_called_class($this->renderer)." není typem rendereru, který může renderovat template typu ".get_called_class($this->template).". Zadané template vyžaduje"
-                            . " renderer typu $templateDefaultRendererClass.");
-                }
-            }
-        } else {
-            if ($this->template) {
-                $this->createTemplateRenderer();
-                if (!isset($this->renderer)) {
-                    user_error("Nepodařilo se získat renderer z renderer kontejneru pro službu {$this->template->getDefaultRendererService()} vrácenou metodou getDefaultRendererService() zadané template ".get_called_class($this->template).". Použit fallback renderer a fallbach template.", E_USER_WARNING);
-                }
-            }
-            if (!isset($this->renderer)) {
-                user_error("Není nastaven renderer, použit fallback renderer a fallback template.", E_USER_NOTICE);
-                $this->renderer = new FallbackRenderer();
-                $this->template = new FallbackTemplate();
-            }
-        }
-    }
-
-    private function createTemplateRenderer() {
-        $this->renderer = TemplateRendererContainer::get($this->template->getDefaultRendererService());
+        return $this->renderer->render($data ?? $this->data);
     }
 
     /**
@@ -156,16 +148,69 @@ class View implements ViewInterface {
      * @return string
      */
     public function __toString() {
-        //
-
-            try {
-                $str = $this->getString();
-            } catch (\Throwable $e) {
-                user_error(' Výjimka pri vykonávání metody __toString: '.$e->getMessage().' in: '.$e->getFile().' on line: '.$e->getLine().'.', E_USER_ERROR);
-                $str = '';
-            }
-
+        try {
+            $str = $this->getString();
+        } catch (\Throwable $e) {
+            user_error(' Výjimka pri vykonávání metody __toString: '.$e->getMessage().' in: '.$e->getFile().' on line: '.$e->getLine().'.'
+            .PHP_EOL.str_replace('\n', PHP_EOL, $e->getTraceAsString()), E_USER_ERROR);
+            $str = '';
+        }
         return $str;
     }
 
+    ##### private methods ###########################
+
+    private function resolveRenderer() {
+        if (!isset($this->renderer)) {
+            if (isset($this->rendererName) OR isset ($this->rendererContainer)) {
+                $this->useRendererFromContainer();   // vytváří user error
+            } elseif ($this->template) {
+                $this->createTemplateRenderer();   // vytváří user error
+            }
+            if (!isset($this->renderer)) {
+                $this->useFallbackRendereAndTemplate();   // vytváří user error
+            }
+        }
+        $this->checkRendererTemplateConsistency();  // vyhodí výjimku
+    }
+
+    private function checkRendererTemplateConsistency() {
+        if (isset($this->template)) {
+            $templateDefaultRendererClass = $this->template->getDefaultRendererService();
+            if ( !($this->renderer instanceof $templateDefaultRendererClass)) {
+                throw new \UnexpectedValueException("Zadaný renderer ". get_called_class($this->renderer)." není typem rendereru, který může renderovat template typu ".get_called_class($this->template).". Zadané template vyžaduje"
+                        . " renderer typu $templateDefaultRendererClass.");
+            }
+        }
+    }
+
+    private function useRendererFromContainer() {
+        if (isset($this->rendererName) AND isset ($this->rendererContainer)) {
+            $this->renderer = $this->rendererContainer->get($this->rendererName);
+        } else {
+            if (isset($this->rendererName)) {
+                user_error("Je nastaveno jméno rendereru (jméno služby renderer kontejneru) a není nastaven renderer kontejner.", E_USER_NOTICE);
+            } else {
+                user_error("Je nastaven renderer kontejner a není nastaveno jméno rendereru (jméno služby renderer kontejneru).", E_USER_NOTICE);
+            }
+        }
+    }
+
+    private function createTemplateRenderer() {
+        $this->renderer = TemplateRendererContainer::get($this->template->getDefaultRendererService());
+        if (!isset($this->renderer)) {
+            user_error("Nepodařilo se získat renderer z renderer kontejneru pro službu {$this->template->getDefaultRendererService()} vrácenou metodou getDefaultRendererService() zadané template ".get_called_class($this->template).". Použit fallback renderer a fallbach template.", E_USER_WARNING);
+        }
+    }
+
+    private function useFallbackRendereAndTemplate() {
+        $containerClass = isset($this->rendererContainer) ? get_class($this->rendererContainer) : 'null';
+        $templateClass = isset($this->template) ? get_class($this->template) : 'null';
+        user_error("Nepodařilo se získat renderer, je použit fallback renderer a fallback template. "
+                . " Renderer name: {$this->rendererName},"
+                . " renderer container: $containerClass,"
+                . " template: {$templateClass}", E_USER_NOTICE);
+        $this->renderer = new FallbackRenderer();
+        $this->template = new FallbackTemplate();
+    }
 }

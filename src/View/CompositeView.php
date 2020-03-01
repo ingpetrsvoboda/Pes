@@ -2,12 +2,6 @@
 
 namespace Pes\View;
 
-use Pes\View\Template\TemplateInterface;
-use Pes\View\Renderer\TemplateRendererInterface;
-use Pes\View\Renderer\RecordableRendererInterface;
-
-use Pes\View\Renderer\RendererContainer;
-use Pes\View\Renderer\ImplodeRenderer;
 /**
  *
  * @author pes2704
@@ -25,15 +19,8 @@ class CompositeView extends View implements CompositeViewInterface {
      */
     private $componentViews;
 
-    /**
-     * Přijímá kompozitní renderer, renderer používaný pro renderování kompozice (nadřazený, layout renderer).
-     *
-     * @param RendererInterface $renderer
-     */
-    public function setRenderer(Renderer\RendererInterface $renderer): ViewInterface {
-        $this->renderer = $renderer;
+    public function __construct() {
         $this->componentViews = new \SplObjectStorage();
-        return $this;
     }
 
     /**
@@ -45,8 +32,9 @@ class CompositeView extends View implements CompositeViewInterface {
      * @param ViewInterface $componentView Komponetní view
      * @param string $name Jméno proměnné v kompozitním view, která má být nahrazena výstupem zadané komponentní view
      */
-    public function appendComponentView(ViewInterface $componentView, $name) {
+    public function appendComponentView(ViewInterface $componentView, $name): CompositeViewInterface {
         $this->componentViews->attach($componentView, $name);
+        return $this;
     }
 
     /**
@@ -62,10 +50,6 @@ class CompositeView extends View implements CompositeViewInterface {
         $composeViewData = array();
         if (count($this->componentViews)>0) {
             foreach ($this->componentViews as $componentView) {
-                /* @var ViewInterface $componentView */
-                if (isset($this->recorderProvider)) {
-                    $componentView->setRecorderProvider($this->recorderProvider);
-                }
                 $composeViewData[$this->componentViews->getInfo()] = $componentView->getString();
             }
         }
@@ -75,6 +59,6 @@ class CompositeView extends View implements CompositeViewInterface {
         } else {
             $data = $composeViewData;
         }
-        return parent::render($data);
+        return parent::getString($data);
     }
 }

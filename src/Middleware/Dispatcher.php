@@ -87,9 +87,10 @@ class Dispatcher implements MiddlewareInterface
      * @return ResponseInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface {
-        $this->stack[] = function (ServerRequestInterface $request) use ($handler) {
-            return $handler->process($request);
-        };
+//        $this->stack[] = function (ServerRequestInterface $request) use ($handler) {
+//            return $handler->handle($request);
+//        };
+        $this->stack[] = $handler;
 //        $response = $this->dispatch($request);
         $resolved = $this->resolve(0);
         return $resolved($request);
@@ -113,24 +114,29 @@ class Dispatcher implements MiddlewareInterface
      */
     private function resolve($index) {
         if (isset($this->stack[$index])) {
-            return new RequestHandler(function (ServerRequestInterface $request) use ($index) {
-                //zavolá na položku resolver (výsledek musí být middleware nebo callable) nebo použije položku
-                $middleware = $this->resolver ? call_user_func($this->resolver, $this->stack[$index]) : $this->stack[$index];
-                if ($middleware instanceof MiddlewareInterface) {
-                    if ($middleware instanceof AppMiddlewareInterface) {
-                        $middleware->setApp($this->app);
+            if ($this->stack[$index] instanceof RequestHandlerInterface) {
+                return $this->stack[$index];
+            } else {
+                return new RequestHandler(
+                    function (ServerRequestInterface $request) use ($index) {
+                        //zavolá na položku resolver (výsledek musí být middleware nebo callable) nebo použije položku
+                        $middleware = $this->resolver ? call_user_func($this->resolver, $this->stack[$index]) : $this->stack[$index];
+                        if ($middleware instanceof MiddlewareInterface) {
+                            if ($middleware instanceof AppMiddlewareInterface) {
+                                $middleware->setApp($this->app);
+                            }
+                            $result = $middleware->process($request, $this->resolve($index + 1));
+                            if (! $result instanceof ResponseInterface) {
+                                throw new \DomainException("Middleware v zásobníku s indexem $index nevrátilo objekt typu ResponseInterface.");
+                            }
+                        } else {
+                            throw new \UnexpectedValueException("Nepodporovaný typ middleware ".get_class($this->stack[$index])." v zásobníku s indexem $index. Podporované jsou objekty typu MiddlewareInterface.");
+                        }
+                        return $result;
                     }
-                    $result = $middleware->process($request, $this->resolve($index + 1));
-                    if (! $result instanceof ResponseInterface) {
-                        throw new \DomainException("Middleware v zásobníku s indexem $index nevrátilo objekt typu ResponseInterface.");
-                    }
-                } else {
-                    throw new \UnexpectedValueException("Nepodporovaný typ middleware v zásobníku s indexem {index}. Podporované jsou objekty typu MiddlewareInterface.", array("index"=>$index));
-                }
-                return $result;
-            });
+                );
+            }
         }
         return new UnprocessedRequestHandler();
     }
-
 }

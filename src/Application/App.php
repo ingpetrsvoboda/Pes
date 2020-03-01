@@ -20,7 +20,7 @@ use Psr\Http\Message\ResponseInterface;
 
 use Psr\Container\ContainerInterface;
 
-use Pes\Application\UriInfoInterface;
+use Pes\Http\Factory\BodyFactory;
 
 /**
  * Description of App
@@ -84,6 +84,19 @@ class App implements AppInterface {
      * @return ResponseInterface Http response
      */
     public function run(MiddlewareInterface $middleware, RequestHandlerInterface $fallbackHandler): ResponseInterface {
-        return $middleware->process($this->serverRequest, $fallbackHandler);
+        $response = $middleware->process($this->serverRequest, $fallbackHandler);
+
+        /**
+         * This is to be in compliance with RFC 2616, Section 9.
+         * If the incoming request method is HEAD, we need to ensure that the response body
+         * is empty as the request may fall back on a GET route handler which could potentially append content to the response body
+         * https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.4
+         */
+        $method = strtoupper($this->serverRequest->getMethod());
+        if ($method === 'HEAD') {
+            $emptyBody = (new BodyFactory())->createStream('');
+            $response = $response->withBody($emptyBody);
+        }
+        return $response;
     }
 }

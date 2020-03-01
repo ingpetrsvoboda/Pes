@@ -10,6 +10,11 @@ namespace Pes\Router;
 class Route implements RouteInterface {
 
     /**
+     * @var UrlPatternValidator
+     */
+    private $urlPatternValidator;
+
+    /**
      * @var string
      */
     private $method;
@@ -28,6 +33,15 @@ class Route implements RouteInterface {
      * @var string
      */
     private $action;
+
+    /**
+     * @var string
+     */
+    private $name;
+
+    public function __construct(UrlPatternValidator $urlPatternValidator) {
+        $this->urlPatternValidator = $urlPatternValidator;
+    }
 
     public function getMethod() {
         return $this->method;
@@ -55,27 +69,6 @@ class Route implements RouteInterface {
      */
     public function getAction() {
         return $this->action;
-    }
-
-    /**
-     * Vrací REST path vytvořenou s použitím pattern routy a zadaných parametrů path. Parametry jsou vloženy na místa proměnných v pattern.
-     *
-     * @param array $pathParams
-     * @return string
-     * @throws UnexpectedValueException
-     */
-    public function getPathFor(array $pathParams) {
-        $replaced = 0;
-        $pattern = $this->urlPattern;
-        foreach ($pathParams as $key => $value) {
-            $pattern = str_replace(':'.$key, $value, $pattern, $replaced);
-            if ($replaced==0) {
-                throw new UnexpectedValueException("Nenalezen parametr v pattern routy. Parametr: '$key'.");
-            } elseif ($replaced>1) {
-                throw new UnexpectedValueException("Nalezaeno více stejně pojmenovaných parametrů v pattern routy. Parametr: '$key'.");
-            }
-        }
-        return $this->filterPath($pattern);
     }
 
     /**
@@ -121,19 +114,8 @@ class Route implements RouteInterface {
      * @return \Pes\Router\RouteInterface
      * @throws \UnexpectedValueException Chybný formát pattern...
      */
-    public function setUrlPattern($urlPattern): RouteInterface {
-        if ($urlPattern == '') {
-            throw new \UnexpectedValueException("Chybný formát pattern. Pattern routy nesmí být prázdný řetězec.");
-        }
-        if ($urlPattern[0] != '/') {
-            throw new \UnexpectedValueException("Chybný formát pattern. Pattern routy musí začínat znakem '/'. Zadán pattern: $urlPattern");
-        }
-//        if ($urlPattern[-1] != '/') {
-//            throw new \UnexpectedValueException("Chybný formát pattern. Pattern routy musí končit znakem '/'. Zadán pattern: $urlPattern");
-//        }
-        if (($urlPattern[1] ?? '') == ':') {
-            throw new \UnexpectedValueException("Chybný formát pattern. Pattern routy nesmí na první pozici zleva obsahovat parametr. Zadán pattern: $urlPattern");
-        }
+    public function setUrlPattern($urlPattern): RouteInterface {    // 50 microsec
+        $this->urlPatternValidator->validate($urlPattern);
         $this->urlPattern = $urlPattern;
         // konvertuje route url na regulární výraz - obalí pattern routy znaky začátku a konce regulárního výrazu
         // a nahradí části začínající : výrazem ([a-zA-Z0-9\-\_]+)

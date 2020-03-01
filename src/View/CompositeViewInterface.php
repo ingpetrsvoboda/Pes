@@ -22,5 +22,5 @@ interface CompositeViewInterface extends ViewInterface {
     /**
      * @return ComposerViewInterface
      */
-    public function appendComponentView(ViewInterface $componentView, $name): ViewInterface ;
+    public function appendComponentView(ViewInterface $componentView, $name): CompositeViewInterface ;
 }

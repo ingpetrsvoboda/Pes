@@ -140,16 +140,16 @@ MethodEnum
  [x] Get patch method type
 
 Route
- [x] Constructor
- [x] Set method get method
- [x] Set url pattern
- [x] Exception empty pattern
- [x] Exception missing left slash
- [x] Exception paremeter in first section
- [x] Set get url pattern
- [x] Get pattern preg
- [x] Set get action
- [x] Get path for
+ [ ] Constructor
+ [ ] Set method get method
+ [ ] Set url pattern
+ [ ] Exception empty pattern
+ [ ] Exception missing left slash
+ [ ] Exception paremeter in first section
+ [ ] Set get url pattern
+ [ ] Get pattern preg
+ [ ] Set get action
+ [ ] Get path for
 
 Coder
  [x] Base 64 url
@@ -178,12 +178,12 @@ Enum
  [x] Get due type
 
 IsArrayKeyValidator
- [x] Is valid
+ [ ] Is valid
 
 IsObjectTypeValidator
- [x] Constructor
- [x] Is valid
+ [ ] Constructor
+ [ ] Is valid
 
 IsSerializableValidator
- [x] Is valid
+ [ ] Is valid
 

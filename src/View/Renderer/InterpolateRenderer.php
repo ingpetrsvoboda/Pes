@@ -11,54 +11,59 @@
 
 namespace Pes\View\Renderer;
 
-use Pes\View\Renderer\Exception\NoTemplateFileException;
-use Pes\View\Template\InterpolateTemplateInterface;
+use Pes\View\Template\TemplateInterface;
+use Pes\View\Renderer\Exception\UnsupportedTemplateException;
 
 /**
  * Description of ScriptView
  *
  * @author pes2704
  */
-class InterpolateRenderer implements InterpolateRendererInterface {
+class InterpolateRenderer extends FileTemplateRendererAbstract implements InterpolateRendererInterface {
+
+    private $template;
+
+
+    public function setTemplate(TemplateInterface $template) {
+        if ($template->getDefaultRendererService() !== InterpolateRenderer::class) {
+            throw new UnsupportedTemplateException("Renderer ". get_called_class()." nepodporuje renderování template typu ". get_class($this->template));
+        }
+        $this->template = $template;
+    }
 
     /**
      * Použije text souboru jako šablonu a nahradí slova v závorkách hodnotami pole dat s klíčem rovným nahrazovanému slovu.
      *
      * Pokud některá hodnota není definována nebo ji nelze převést na string - nahradí slovo v závorkách prázdným řetězcem a Hlásí E_USER_WARNING.
      *
-     * @param InterpolateTemplateInterface $template
      * @param type $data Array nebo \Traversable
      * @return string
      * @throws NoTemplateFileException
      */
-    public function render(InterpolateTemplateInterface $template, $data=NULL) {
-        if (is_readable($template->getTemplateFilename())) {   //200mikrosec
-            $text = \file_get_contents($template->getTemplateFilename());   //250 mikrosec (file_get_contents vrací FALSE při neúspěchu a E_WARNING, pokud neex soubor)
-            if ($text) {
-                if (isset($data)) {
-                $replace = [];
-                $leftBracket = $template->getLeftBracket();
-                $righrBracket = $template->getRightBracket();
-                // sestav pole náhrad
-                foreach ($data as $key => $val) {
-                    // ověř, že hodnota může být převedena na string
-                    if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {
-                        $replace[$leftBracket . $key . $righrBracket] = $val;
-                    } else {
-                        $replace[$leftBracket . $key . $righrBracket] = '';
-                        user_error("Hodnotou s klíčem $key nelze interpolovat, hodnota není definována nebo hodnotu nelze převést na string.", E_USER_WARNING);
-                    }
-                }
-                    // interpoluj náhrady do textu
-                    return strtr($text, $replace);
+    public function render(iterable $data=NULL) {
+        $text = $this->getTemplateFileContent($this->template);
+        if ($text) {
+            if (isset($data)) {
+            $replace = [];
+            $leftBracket = $this->template->getLeftBracket();
+            $righrBracket = $this->template->getRightBracket();
+            // sestav pole náhrad
+            foreach ($data as $key => $val) {
+                // ověř, že hodnota může být převedena na string
+                if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {
+                    $replace[$leftBracket . $key . $righrBracket] = $val;
                 } else {
-                    return $text;
+                    $replace[$leftBracket . $key . $righrBracket] = '';
+                    user_error("Hodnotou s klíčem $key nelze interpolovat, hodnota není definována nebo hodnotu nelze převést na string.", E_USER_WARNING);
                 }
+            }
+                // interpoluj náhrady do textu
+                return strtr($text, $replace);
             } else {
-                return '';
+                return $text;
             }
         } else {
-            throw new NoTemplateFileException('Nepodařilo se nalézt soubor "'.$template->getTemplateFilename().'". Soubor neexistuje nebo jej nelze číst.');
+            return '';
         }
     }
 }

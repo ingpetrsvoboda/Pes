@@ -84,14 +84,14 @@ class Html {
      * @param type $text
      * @return type
      */
-    public function mono($text='') {
+    public static function mono($text='') {
         return preg_replace('|(\s[ksvzouiaKSVZOUIA])\s|', '$1&nbsp;', trim($text));
     }
 
     /**
      * Převede text s dvakrát odřádkovanými odstavci na html paragrafy (<p></p>)
      * Vstupní text obalí na začátku a na konci otevíracím tagem <p> a koncovým tagem </p>,
-     * výskyty dvou odřádkovýní uvnitř textu chápe jako konec odstavce a z každého takto odděleného úseku textu vytvoří paragraf.
+     * výskyty dvou odřádkování uvnitř textu chápe jako konec odstavce a z každého takto odděleného úseku textu vytvoří paragraf.
      * Jednoho odřádkování v textu si nijak nevšímá, váš vstupní text můžete jedním odřádkováním zalamovat libovolně, např. proto, aby byl vidět ve vašem editoru.
      * Chcete-li skutečně vytvořit odstavec, použijte dvojí odřádkování.
      *
@@ -99,7 +99,7 @@ class Html {
      * @param type $text
      * @return string
      */
-    public function p($text='', $attributes=[]) {
+    public static function p($text='', $attributes=[]) {
         // kopie z https://core.trac.wordpress.org/browser/trunk/src/wp-includes/formatting.php
         //
         if ( trim($text) === '' )
@@ -117,7 +117,7 @@ class Html {
         // Složí text z kousků obalených počátečním a koncovým <p>
         $text = '';
         foreach ( $chunks as $chunk ) {
-            $text .= $this->tag("p", $this->attributes($attributes), trim($chunk));  // původně bylo $text .= '<p>' . trim($chunk, "\n") . "</p>\n";
+            $text .= self::tag("p", $attributes, trim($chunk));  // původně bylo $text .= '<p>' . trim($chunk, "\n") . "</p>\n";
         }
         // Under certain strange conditions it could create a P of entirely whitespace.
         $text = preg_replace('|<p>\s*</p>|', '', $text);
@@ -135,7 +135,7 @@ class Html {
     }
 
     /**
-     * Escapuje retězec, který obsahuje javascript, který má být vložen jako inline javarcript do atributu onclick, onblur atd.
+     * Escapuje retězec, který obsahuje javascript, který má být vložen jako inline javascript do atributu onclick, onblur atd.
      *
      * @param string $text
      */
@@ -144,6 +144,35 @@ class Html {
         $safe_text = preg_replace( '/&#(x)?0*(?(1)27|39);?/i', "'", stripslashes( $safe_text ) );  // stripslashes odstraní escapovací zpětná lomítka (vždy jedno), preg vymění &#x27; a &#039; (oboje apostrofy) za apostrof
 
         return $safe_text;
+    }
+
+    public static function removeDiacritics($text) {
+        // i pro multi-byte (napr. UTF-8)
+        $prevodni_tabulka = Array(
+          'ä'=>'a',  'Ä'=>'A',  'á'=>'a',  'Á'=>'A',
+          'à'=>'a',  'À'=>'A',  'ã'=>'a',  'Ã'=>'A',
+          'â'=>'a',  'Â'=>'A',  'č'=>'c',  'Č'=>'C',
+          'ć'=>'c',  'Ć'=>'C',  'ď'=>'d',  'Ď'=>'D',
+          'ě'=>'e',  'Ě'=>'E',  'é'=>'e',  'É'=>'E',
+          'ë'=>'e',  'Ë'=>'E',  'è'=>'e',  'È'=>'E',
+          'ê'=>'e',  'Ê'=>'E',  'í'=>'i',  'Í'=>'I',
+          'ï'=>'i',  'Ï'=>'I',  'ì'=>'i',  'Ì'=>'I',
+          'î'=>'i',  'Î'=>'I',  'ľ'=>'l',  'Ľ'=>'L',
+          'ĺ'=>'l',  'Ĺ'=>'L',  'ń'=>'n',  'Ń'=>'N',
+          'ň'=>'n',  'Ň'=>'N',  'ñ'=>'n',  'Ñ'=>'N',
+          'ó'=>'o',  'Ó'=>'O',  'ö'=>'o',  'Ö'=>'O',
+          'ô'=>'o',  'Ô'=>'O',  'ò'=>'o',  'Ò'=>'O',
+          'õ'=>'o',  'Õ'=>'O',  'ő'=>'o',  'Ő'=>'O',
+          'ř'=>'r',  'Ř'=>'R',  'ŕ'=>'r',  'Ŕ'=>'R',
+          'š'=>'s',  'Š'=>'S',  'ś'=>'s',  'Ś'=>'S',
+          'ť'=>'t',  'Ť'=>'T',  'ú'=>'u',  'Ú'=>'U',
+          'ů'=>'u',  'Ů'=>'U',  'ü'=>'u',  'Ü'=>'U',
+          'ù'=>'u',  'Ù'=>'U',  'ũ'=>'u',  'Ũ'=>'U',
+          'û'=>'u',  'Û'=>'U',  'ý'=>'y',  'Ý'=>'Y',
+          'ž'=>'z',  'Ž'=>'Z',  'ź'=>'z',  'Ź'=>'Z'
+        );
+
+        return strtr($text, $prevodni_tabulka);
     }
 
     /**

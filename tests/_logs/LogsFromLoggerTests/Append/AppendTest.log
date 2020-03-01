@@ -1,0 +1,4 @@
+[info] [2020-02-03 10:23:25] Logger start. Log file: _logs/LogsFromLoggerTests/Append/AppendTest.log.
+[alert] FileLoggerTest v 1580721805
+[info] [2020-02-05 10:36:27] Logger start. Log file: _logs/LogsFromLoggerTests/Append/AppendTest.log.
+[alert] FileLoggerTest v 1580895387

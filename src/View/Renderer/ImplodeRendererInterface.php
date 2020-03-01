@@ -11,10 +11,11 @@
 
 namespace Pes\View\Renderer;
 
+use Pes\View\Template\ImplodeTemplateInterface;
+
 /**
  *
  * @author pes2704
  */
 interface ImplodeRendererInterface extends TemplateRendererInterface {
-    public function render(ImplodeTemplateInterface $template, $data=NULL);
 }

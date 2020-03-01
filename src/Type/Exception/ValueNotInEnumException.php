@@ -15,6 +15,6 @@ namespace Pes\Type\Exception;
  *
  * @author pes2704
  */
-class ValueNotInEnumException extends \UnexpectedValueException {
+class ValueNotInEnumException extends \UnexpectedValueException implements TypeExceptionInterface {
 
 }

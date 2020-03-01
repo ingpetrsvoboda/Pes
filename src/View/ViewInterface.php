@@ -12,6 +12,7 @@
 namespace Pes\View;
 
 use Pes\View\Renderer\RendererInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  *
@@ -25,8 +26,9 @@ interface ViewInterface {
      */
     public function getString($data=NULL);
     public function __toString();
-    public function getRenderer(): RendererInterface;
     public function setRenderer(RendererInterface $renderer): ViewInterface;
+    public function setRendererContainer(ContainerInterface $rendererContainer): ViewInterface;
+    public function setRendererName($rendererName): ViewInterface;
     public function setData($data): ViewInterface;
 }
 

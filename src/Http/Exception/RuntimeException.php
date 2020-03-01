@@ -16,6 +16,6 @@ namespace Pes\Http\Exception;
  *
  * @author pes2704
  */
-class RuntimeException extends \RuntimeException implements Exception {
+class RuntimeException extends \RuntimeException implements HttpExceptionInterface {
     //put your code here
 }

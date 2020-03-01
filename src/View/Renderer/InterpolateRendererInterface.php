@@ -18,6 +18,5 @@ use Pes\View\Template\InterpolateTemplateInterface;
  * @author pes2704
  */
 interface InterpolateRendererInterface extends TemplateRendererInterface {
-    public function render(InterpolateTemplateInterface $template, $data=NULL);
 
 }

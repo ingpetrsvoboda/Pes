@@ -16,6 +16,6 @@ namespace Pes\Utils\Exception;
  *
  * @author pes2704
  */
-class InvalidArgumentException extends \InvalidArgumentException implements Exception {
+class InvalidArgumentException extends \InvalidArgumentException implements UtilsExceptionInterface {
 
 }

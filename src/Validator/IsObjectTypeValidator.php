@@ -6,10 +6,11 @@ namespace Pes\Validator;
  * @author pes2704
  */
 class IsObjectTypeValidator implements ValidatorInterface {
+exception
     private $type;
-   
+
     /**
-     * 
+     *
      * @param string $type Jméno typu - jméno interface or class (FQDN - plné kvalifikobané jméno včetně namespace).
      * @throws \InvalidArgumentException
      */
@@ -26,8 +27,8 @@ class IsObjectTypeValidator implements ValidatorInterface {
             throw new \InvalidArgumentException("Jméno typu musí být zadáno jako string.");
         }
     }
-    
-    public function isValid($param) {
+
+    public function validate($param) {
         return $param instanceof $this->type ? TRUE : FALSE;
     }
 }

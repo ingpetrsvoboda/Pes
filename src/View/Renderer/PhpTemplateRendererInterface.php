@@ -18,5 +18,5 @@ use Pes\View\Template\PhpTemplateInterface;
  * @author pes2704
  */
 interface PhpTemplateRendererInterface extends TemplateRendererInterface {
-    public function render(PhpTemplateInterface $template, $data=NULL);
+
 }

@@ -2,8 +2,9 @@
 
 namespace Pes\View\Renderer;
 
-use Pes\View\Template\PhpTemplateInterface;
+use Pes\View\Template\TemplateInterface;
 use Pes\View\Recorder\RecorderProviderInterface;
+use Pes\View\Renderer\Exception\UnsupportedTemplateException;
 
 /**
  * Renderer - vstupem je html/php šablona, což je spustitelný soubor PHP, výstupem je text.
@@ -29,6 +30,8 @@ class PhpTemplateRenderer implements PhpTemplateRendererInterface, PhpTemplateFu
 
     const FILTER_DELIMITER = '|';
 
+    private $template;
+
     /**
      * @var RecorderProviderInterface
      */
@@ -39,6 +42,13 @@ class PhpTemplateRenderer implements PhpTemplateRendererInterface, PhpTemplateFu
      * @var string
      */
     private $templateFileNamesStack = [];
+
+    public function setTemplate(TemplateInterface $template) {
+        if ($template->getDefaultRendererService() !== PhpTemplateRenderer::class) {
+            throw new UnsupportedTemplateException("Renderer ". get_called_class()." nepodporuje renderování template typu ". get_class($this->template));
+        }
+        $this->template = $template;
+    }
 
     /**
      * Proměnná nastavována v protectedIncludeScope k užití pro metody insert() a další
@@ -75,11 +85,10 @@ class PhpTemplateRenderer implements PhpTemplateRendererInterface, PhpTemplateFu
      * @throws \Throwable <p>Znovu vyhodí Error nebo Exception, pokud vznikla někde při vykonávání kódu template. Před vyhozením takové chyby nebo výjimky
      * nejprve odešle na výstup obsah výstupního bufferu (všech úrovní bufferu), který do něj byl zapsán předtím, než chyba nebo výjimka vznikla.</p>
      *
-     * @param PhpTemplateInterface $template
-     * @param \Traversable $data
+     * @param iterable $data
      * @return string
      */
-    public function render(PhpTemplateInterface $template, $data=NULL) {
+    public function render(iterable $data=NULL) {
 
         // unused vypnuto zde a na konci includeToProtectedScope()
         //        if (isset($recorderProvider)) {
@@ -88,7 +97,7 @@ class PhpTemplateRenderer implements PhpTemplateRendererInterface, PhpTemplateFu
         //        }
         //        $this->catchTemplateVars($this->templateFileName);
 
-        $templateFilename = $template->getTemplateFilename();
+        $templateFilename = $this->template->getTemplateFilename();
         return $this->includeToProtectedScope($templateFilename, $data);
     }
 

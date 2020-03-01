@@ -16,7 +16,7 @@ namespace Pes\Http\Exception;
  *
  * @author pes2704
  */
-class UploadException extends RuntimeException {
+class UploadException extends \RuntimeException implements HttpExceptionInterface {
 
     public function __construct($message, $code=-1) {
         $messageFull = $message.' Upload error message: '.$this->codeToErrorMessage($code);

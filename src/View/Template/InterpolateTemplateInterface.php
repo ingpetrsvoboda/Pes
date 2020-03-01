@@ -1,12 +1,9 @@
 <?php
 
 /*
- * Copyright (C) 2019 pes2704
- *
- * This is no software. This is quirky text and you may do anything with it, if you like doing
- * anything with quirky texts. This text is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 namespace Pes\View\Template;
@@ -16,7 +13,7 @@ namespace Pes\View\Template;
  * @author pes2704
  */
 interface InterpolateTemplateInterface extends FileTemplateInterface {
-    
+
     public function getLeftBracket();
 
     public function getRightBracket();

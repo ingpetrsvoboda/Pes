@@ -92,8 +92,11 @@ class HandlerMySQLTest extends TestCase {
         $dbh->exec('INSERT INTO person (number, name, surname) VALUES (3, "Cyril","'.self::TESTOVACI_STRING.'")');
 
         // nastaví logger pro použití v testech
-        $dir = 'Pes/tests/Logs/LogsFromHandlerTests';
-        $file = 'testHandlerForMysql.log';
+        $baseLogsDir="_logs/";
+        $dir = 'LogsFromHandlerTests/';
+        $file = get_called_class().'.log';
+            // base
+        FileLogger::setBaseLogsDirectory($baseLogsDir);
         $this->logger = FileLogger::getInstance($dir, $file, FileLogger::REWRITE_LOG);
     }
 

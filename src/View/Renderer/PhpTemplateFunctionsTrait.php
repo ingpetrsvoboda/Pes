@@ -139,27 +139,32 @@ trait PhpTemplateFunctionsTrait {
      *
      * @param string $text
      */
-    public static function esc_js($text='') {
+    public function esc_js($text='') {
         $safe_text = htmlspecialchars( $text, ENT_COMPAT );   // konvertuje &"<> na &xxx kódy (ENT_COMPAT Will convert double-quotes and leave single-quotes alone.)
         $safe_text = preg_replace( '/&#(x)?0*(?(1)27|39);?/i', "'", stripslashes( $safe_text ) );  // stripslashes odstraní escapovací zpětná lomítka (vždy jedno), preg vymění &#x27; a &#039; (oboje apostrofy) za apostrof
 
         return $safe_text;
     }
-    
+
     /**
-     * Metoda generuje textovou reprezentaci atributů html tagu z dataných jako asocitivní pole.
-     * Atributy s logickou hodnotou uvede jen jako jméno parametru, ostatní atributy jako dvojici jméno="hodnota" s tím, že hodnotu
-     * prvku obalí uvozovkami. Vásledná řetězec začíná mezerou a atributy v řetězci jsou odděleny mezerami.
+     * Metoda generuje textovou reprezentaci atributů html tagu z dat zadaných jako asociativní pole.
+     * - Atributy s logickou hodnotou: generuje pro hodnotu TRUE jen jméno parametru, pro hodnotu FALSE nic
+     * - ostatní atributy: generuje dvojici jméno="hodnota" s tím, že hodnotu prvku obalí uvozovkami. Výsledný
+     * řetězec začíná mezerou a atributy v řetězci jsou odděleny mezerami.
      *
      * Příklad:
-     * ['class'=>'ui item alert', 'readonly'=>TRUE] převede na: class="ui item alert" readonly
+     * ['class'=>'ui item alert', 'readonly'=>TRUE, ] převede na: class="ui item alert" readonly
+     * ['class'=>'ui item ok', 'readonly'=>FALSE, ] převede na: class="ui item ok"
+     *
      * @param array $attributesArray Asocitivní pole
      * @return string
      */
     public function attributes($attributesArray=[]) {
         foreach ($attributesArray as $type => $value) {
             if (is_bool($value)) {
-                $attr[] = $type;
+                if ($value) {
+                    $attr[] = $type;
+                }
             } else {
                 $attr[] = $type.'="'.$value.'"';
             }

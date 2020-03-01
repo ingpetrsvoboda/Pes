@@ -29,7 +29,7 @@ class Directory {
         if($cwd) {
             return self::normalizePath($cwd);
         } eLse {
-            throw new \RuntimeException('Nelze číst pracovní adresář skriptu. Mohou být nedostatečná práVa k adresáři skriptu nebo některému nadřazenémU adresářI.');
+            throw new \RuntimeException('Nelze číst pracovní adresář skriptu. Mohou být nedostatečná práva k adresáři skriptu nebo některému nadřazenémU adresáři.');
         }
     }
 
@@ -70,7 +70,7 @@ class Directory {
             if (mkdir($normPath, 0777, TRUE)) {  // druhý parametr je ve Windows ignorován
                 return $normPath;
             } else {
-                throw new CreateDirectoryFailedException("Nepodařilo se vytvořit složku pro zadanou cestu.");  // vypsat uživateli cestu je asi nebezpečné
+                throw new CreateDirectoryFailedException("Creating folder for passed path failed.");  // vypsat uživateli cestu je asi nebezpečné
             }
         }
     }

@@ -2,7 +2,9 @@
 
 namespace Pes\View\Renderer;
 
-use Pes\View\Template\NodeTemplateInterface;
+use Pes\View\Renderer\Exception\UnsupportedTemplateException;
+
+use Pes\View\Template\TemplateInterface;
 use Pes\Dom\Node\NodeInterface;
 use Pes\Dom\Node\Tag\TagInterface;
 use Pes\Dom\Node\Text\TextInterface;
@@ -18,6 +20,8 @@ class NodeRenderer implements NodeRendererInterface, RendererRecordableInterface
 
     const SEPARATOR = PHP_EOL;
 
+    private $template;
+
     private $separator=self::SEPARATOR;
 
     /**
@@ -29,8 +33,15 @@ class NodeRenderer implements NodeRendererInterface, RendererRecordableInterface
      * Přijímá separátor, string, který bude  vložen vždy mezi jendnotlivé vyrenderované nody (tagy). Defaultní hodnota je PHP_EOL, t.j. odřádkování.
      * @param string $separator
      */
-    public function setSeparator($separator=self::SEPARATOR) {
+    public function __construct($separator=self::SEPARATOR) {
         $this->separator = $separator;
+    }
+
+    public function setTemplate(TemplateInterface $template) {
+        if ($template->getDefaultRendererService() !== NodeTemplate::class) {
+            throw new UnsupportedTemplateException("Renderer ". get_called_class()." nepodporuje renderování template typu ". get_class($this->template));
+        }
+        $this->template = $template;
     }
 
     public function setRecorderProvider(RecorderProviderInterface $recorderProvider): RendererRecordableInterface {
@@ -43,11 +54,10 @@ class NodeRenderer implements NodeRendererInterface, RendererRecordableInterface
      * @param type $data
      * @return string
      */
-    public function render(NodeTemplateInterface $template, $data=NULL) {
-
+    public function render( $data=NULL) {
         assert(!isset($data), 'Není implementováno zpracování dat. Data se nijak nezpracovávají!! ');
 
-        return $this->renderNode($template->getNode());
+        return $this->renderNode($this->template->getNode());
     }
 
     /**

@@ -33,12 +33,6 @@ abstract class FileTemplateAbstract implements FileTemplateInterface {
     }
 
     /**
-     * Musí vracet jméno třídy rendereru.
-     * @return string
-     */
-    abstract public function getDefaultRendererService();
-
-    /**
      * Vrací název souboru s template.
      * @return string Název souboru s template
      */

@@ -96,7 +96,7 @@ class ArrayFile extends StorageAbstract implements StorageInterface {
      * @throws UnexpectedValueException
      */
     public function get($key) {
-        if ($this->keyValidator->isValid($key)) {
+        if ($this->keyValidator->validate($key)) {
             return $this->arrayContent[$index] ?? NULL;
         }
     }
@@ -115,7 +115,7 @@ class ArrayFile extends StorageAbstract implements StorageInterface {
      * @return $this
      */
     public function set($key, $value) {
-        if ($this->keyValidator->isValid($key)) {
+        if ($this->keyValidator->validate($key)) {
             $this->arrayContent[$key] = $value;
             return $this;
         } else {
