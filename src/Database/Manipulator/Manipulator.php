@@ -51,15 +51,15 @@ class Manipulator {
         $dbhTransact = $this->handler;
         try {
             $dbhTransact->beginTransaction();
-            $dbhTransact->exec("CREATE TABLE $newTableName LIKE $oldTableName");
             $this->logger->info("CREATE TABLE $newTableName LIKE $oldTableName");
-            $dbhTransact->exec("INSERT $newTableName SELECT * FROM $oldTableName");
+            $dbhTransact->exec("CREATE TABLE $newTableName LIKE $oldTableName");
             $this->logger->info("INSERT $newTableName SELECT * FROM $oldTableName");
-            $succ = $dbhTransact->commit();
+            $dbhTransact->exec("INSERT $newTableName SELECT * FROM $oldTableName");
             $this->logger->info('Commit.');
+            $succ = $dbhTransact->commit();
         } catch(\Exception $e) {
+            $this->logger->error('Rollback: '.$e->getMessage());
             $dbhTransact->rollBack();
-            $this->logger->error('Rollback.');
             throw new \RuntimeException($e);
         }
         return $succ ? TRUE : FALSE;
@@ -113,15 +113,15 @@ class Manipulator {
             $dbhTransact->beginTransaction();
             foreach ($queries as $query) {
                 if ($query) {
-                    $dbhTransact->exec($query);
                     $this->logger->info($query);
+                    $dbhTransact->exec($query);
                 }
             }
-            $succ = $dbhTransact->commit();
             $this->logger->info('Commit.');
+            $succ = $dbhTransact->commit();
         } catch(\Exception $e) {
-            $dbhTransact->rollBack();
             $this->logger->error('Rollback: '.$e->getMessage());
+            $dbhTransact->rollBack();
             throw new \RuntimeException($e);
         }
         return $succ ? TRUE : FALSE;
@@ -131,6 +131,7 @@ class Manipulator {
     public function findAllRows($tablename) {
         $query = "SELECT *
                 FROM $tablename ";
+        $this->logger->info($query);
         $stmt = $this->handler->prepare($query);
         $stmt->execute();
         $this->logger->info($query);
@@ -146,6 +147,7 @@ class Manipulator {
         if ($criteria) {
             $query .= "WHERE ".implode(" AND ", $criteria);
         }
+        $this->logger->info($query);
         $stmt = $this->handler->prepare($query);
         foreach($criteriaArray as $key => $value) {
             $stmt->bindValue(":$key", $value);

@@ -17,15 +17,15 @@ class SerializableClassForTest implements \Serializable {
  * @author pes2704
  */
 class IsSerializableValidatorTest extends TestCase {
-    
+
     public function testIsValid() {
         $validator = new IsSerializableValidator();
-        $this->assertTrue($validator->validate('asdfghjkl'));
-        $this->assertTrue($validator->validate(321321));
-        $this->assertTrue($validator->validate([1,2,3,4]));
-        $this->assertTrue($validator->validate(FALSE));
-        $this->assertTrue($validator->validate(NULL));
-        $this->assertFalse($validator->validate(new stdClass()));
-        $this->assertTrue($validator->validate(new SerializableClassForTest()));
+        $validator->validate('asdfghjkl');
+        $validator->validate(321321);
+        $validator->validate([1,2,3,4]);
+        $validator->validate(FALSE);
+        $validator->validate(NULL);
+        $validator->validate(new stdClass());
+        $validator->validate(new SerializableClassForTest());
     }
 }

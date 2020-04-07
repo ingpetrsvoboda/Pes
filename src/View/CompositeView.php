@@ -24,19 +24,31 @@ class CompositeView extends View implements CompositeViewInterface {
     }
 
     /**
-     * Metoda pro přidání komponentních view. Jednotlivá komponentní view budou renderována a vygenerovaný výsledek bude vložen
+     * Metoda pro přidání komponentních view. Při renderování kompozitního view budou renderována komponentní view a vygenerovaný výsledek bude vložen
      * do kompozitního view na místo proměnné zadané zde jako jméno.
      * Jednotlivá komponentní view budou renderována bez předání (nastavení) template a dat, musí mít tedy před renderováním kompozitního view nastavenu šablonu
      * a data pokud je potřebují pro své renderování.
      *
-     * @param ViewInterface $componentView Komponetní view
+     * @param \Pes\View\ViewInterface $componentView Komponetní view
      * @param string $name Jméno proměnné v kompozitním view, která má být nahrazena výstupem zadané komponentní view
+     * @return \Pes\View\CompositeViewInterface
      */
     public function appendComponentView(ViewInterface $componentView, $name): CompositeViewInterface {
         $this->componentViews->attach($componentView, $name);
         return $this;
     }
 
+    /**
+     * Metoda pro přidání komponentních view jako pole nebo \Traversable objekt. Interně volá metodu appendComponentView()
+     * @param iterable $componentViews
+     * @return \Pes\View\CompositeViewInterface
+     */
+    public function appendComponentViews(iterable $componentViews): CompositeViewInterface  {
+        foreach ($componentViews as $name => $componentView) {
+            $this->appendComponentView($componentView, $name);
+        }
+        return $this;
+    }
     /**
      * Metoda renderuje všechny vložené component renderery. Výstupní kód z jednotlivých renderování vkládá do kontextu
      * composer rendereru vždy pod jménem proměnné, se kterým byl component renderer přidán. Nakonec renderuje

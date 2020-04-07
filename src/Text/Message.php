@@ -48,7 +48,9 @@ class Message {
      * @param string $appLocale
      */
     public static function setAppLocale($appLocale) {
-        self::$appLocale = explode('-', $appLocale)[0];
+        // \Locale potřebuje mít povoleno rozšíření intl (php.ini)
+//        self::$appLocale = explode('-', $appLocale)[0];
+        self::$appLocale = \Locale::getPrimaryLanguage($appLocale);
     }
 
     public static function setLogger(LoggerInterface $logger) {

@@ -11,6 +11,8 @@
 
 namespace Pes\Validator;
 
+use Pes\Validator\Exception\NotSerialisableException;
+
 /**
  * IsSerializableValidator ověčuje zda parametr je jistě serializovatelný.
  * Za serializovatelné jsou považovány všechny PHP typy mimo resource a callable (Closure)
@@ -19,9 +21,15 @@ namespace Pes\Validator;
  * @author pes2704
  */
 class IsSerializableValidator implements ValidatorInterface {
-    exception
 
-    public function validate($param) {
-        return ( !(is_callable($param) OR is_resource($param) OR is_object($param)) OR (is_object($param) AND $param instanceof \Serializable)) ? TRUE : FALSE;
+    public function validate($param): void {
+        if (
+                is_callable($param)
+                OR is_resource($param)
+                OR !(is_object($param))
+                OR (is_object($param) AND $param instanceof \Serializable)
+            )  {
+                throw new NotSerialisableException();
+            }
     }
 }

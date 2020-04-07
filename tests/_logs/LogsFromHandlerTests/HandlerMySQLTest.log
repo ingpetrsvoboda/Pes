@@ -1,4 +1,4 @@
-[info] [2020-02-05 10:36:27] Logger start. Log file: _logs/LogsFromHandlerTests/HandlerMySQLTest.log.
+[info] [2020-03-25 19:06:10] Logger start. Log file: _logs/LogsFromHandlerTests/HandlerMySQLTest.log.
 [debug] Pes\Database\Handler\DsnProvider\DsnProviderMysql Vytvořeno dsn: mysql:host=localhost;port=3306;dbname=pes
 [debug] Pes\Database\Handler\OptionsProvider\OptionsProviderMysql: Vytvořeny options - Array
     (

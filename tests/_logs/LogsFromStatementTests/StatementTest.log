@@ -1,4 +1,4 @@
-[info] [2020-02-05 10:36:27] Logger start. Log file: _logs/LogsFromStatementTests/StatementTest.log.
+[info] [2020-03-25 19:06:10] Logger start. Log file: _logs/LogsFromStatementTests/StatementTest.log.
 [debug] Vytvořen database handler Handler pes (11), name pes, host localhost.
 [debug] Handler pes (11) prepare(SELECT name, surname FROM person WHERE number=:number, ). Vytvořen Statement (3).
 [debug] Statement (3) bindParam(:number, 1, 2, , )

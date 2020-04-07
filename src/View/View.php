@@ -62,7 +62,8 @@ class View implements ViewInterface {
     }
 
     /**
-     * Nastaví renderer. Pokud jde o
+     * {@inheritdoc}
+     * 
      * @param RendererInterface $renderer
      * @return \Pes\View\ViewInterface
      */
@@ -77,6 +78,7 @@ class View implements ViewInterface {
     }
 
     /**
+     * {@inheritdoc}
      *
      * @param $rendererName
      * @return ViewInterface

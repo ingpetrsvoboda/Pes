@@ -12,9 +12,9 @@
 namespace Pes\View;
 
 use Pes\View\Recorder\RecorderProviderInterface;
-
+use Pes\View\Renderer\Container\TemplateRendererContainerInterface;
 use Pes\View\Renderer\PhpTemplateRenderer;
-use Pes\View\Template\FileTemplateAbstract;
+use Pes\View\Template\PhpTemplate;
 use Pes\View\Renderer\NodeRenderer;
 use Pes\View\Template\NodeTemplate;
 use Pes\Dom\Node\NodeInterface;
@@ -26,35 +26,45 @@ use Pes\Dom\Node\NodeInterface;
  *
  * @author pes2704
  */
-class ViewFactory {
+class ViewFactory implements viewFactoryInterface {
+
+    private $rendererContainer;
+
+    public function __construct(TemplateRendererContainerInterface $templateRendererContainer=null) {
+        $this->rendererContainer = $templateRendererContainer;
+    }
 
     /**
      * Vytvoří nový view, přímo přetypovatelný na text. Pokud jsou zadána data, nastaví tomuto view i data, to je třeba, pokud zadaná šablona obsahuje proměnné.
      * Vytvořený objekt view je vhodný jako proměnná do šablony nebo jako view pro node typu TextView.
      *
      * Podrobně:
-     * Vytvoří nový objekt view, nastaví mu nově vytvořený renderer a template.
-     * Typy view, rendereru a template jsou dány deklaracemi use uvedenými ve třídě ViewFactory. Metoda vytvořenému view nastaví
+     * Vytvoří nový objekt view, nastaví mu objekt template. Metoda vytvořenému view nastaví
      * data potřebná pro renderování a případně i záznamový objekt pro záznam o užití dat při renderování.
      * Výsledný view obsahuje vše potřebné pro renderování a lze ho kdykoli přetypovat na text.
      *
      * @param type $templateFilename
      * @param type $data
-     * @param RecordLoggerInterface $recorderProvider <p>Nastaví objekt pro logování informací o užití
-     *      proměnných v šabloně. Pokud je nastaven $recorderProvider a zde vytvářený template renderer je typu RecordableRendererInterface
-     *      poskytne tento RocordLogger rekorder a renderer zaznamená užití dat při renderování šablon.</p>
      * @return View
      */
-    public static function viewWithPhpTemplate($templateFilename, $data=[], RecorderProviderInterface $recorderProvider=NULL): View {
-
-        $template = (new FileTemplateAbstract($templateFilename));
-        $renderer = new PhpTemplateRenderer($template);
-        if ($recorderProvider) {
-            $renderer->setRecorderProvider($recorderProvider);
+    public function phpTemplateView($templateFilename, $data=null): View {
+        $template = new PhpTemplate($templateFilename);
+        $view = (new View())
+                ->setTemplate($template)
+                ->setData($data);
+        if ($this->rendererContainer) {
+            $view->setRendererContainer($this->rendererContainer);
         }
-        $view = (new View())->setRenderer($renderer);
-        if ($data) {
-            $view->setData($data);
+        return $view;
+    }
+
+    public function phpTemplateCompositeView($templateFilename, $data=null): View {
+        $template = new PhpTemplate($templateFilename);
+        $view = (new CompositeView())
+                ->setTemplate($template)
+                ->setData($data);
+        if ($this->rendererContainer) {
+            $view->setRendererContainer($this->rendererContainer);
         }
         return $view;
     }
@@ -64,13 +74,12 @@ class ViewFactory {
      * @param TagInterface $node
      * @return View
      */
-    public static function viewWithNode(NodeInterface $node, RecorderProviderInterface $recorderProvider=NULL): View {
+    public function nodeTemplateView(NodeInterface $node): View {
         $template = new NodeTemplate($node);
-        $renderer = new NodeRenderer($template);
-        if ($recorderProvider) {
-            $renderer->setRecorderProvider($recorderProvider);
+        $view = (new View())->setTemplate($template);
+        if ($this->rendererContainer) {
+            $view->setRendererContainer($this->rendererContainer);
         }
-        $view = (new View())->setRenderer($renderer);
         return $view;
     }
 }

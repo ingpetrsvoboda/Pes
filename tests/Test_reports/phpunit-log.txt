@@ -1,3 +1,6 @@
+Resource
+ [x] Get path for
+
 Pes\Autoloader\Autoloader
  [x] Existing file
  [x] Missing file
@@ -140,16 +143,15 @@ MethodEnum
  [x] Get patch method type
 
 Route
- [ ] Constructor
- [ ] Set method get method
- [ ] Set url pattern
- [ ] Exception empty pattern
- [ ] Exception missing left slash
- [ ] Exception paremeter in first section
- [ ] Set get url pattern
- [ ] Get pattern preg
- [ ] Set get action
- [ ] Get path for
+ [x] Constructor
+ [x] Set method get method
+ [x] Set url pattern
+ [x] Exception empty pattern
+ [x] Exception missing left slash
+ [x] Exception paremeter in first section
+ [x] Set get url pattern
+ [x] Get pattern preg
+ [x] Set get action
 
 Coder
  [x] Base 64 url
@@ -178,11 +180,20 @@ Enum
  [x] Get due type
 
 IsArrayKeyValidator
- [ ] Is valid
+ [ ] Is valid string
+ [ ] Is valid integer
+ [ ] Is valid empty string
+ [ ] Array
+ [ ] Object
+ [ ] Bool
+ [ ] Null
 
 IsObjectTypeValidator
- [ ] Constructor
- [ ] Is valid
+ [x] Constructor
+ [ ] Is valid class
+ [ ] Is valid interface
+ [ ] Invalid interface
+ [ ] Invalid class
 
 IsSerializableValidator
  [ ] Is valid

@@ -1,12 +1,13 @@
 <?php
 namespace Pes\Validator;
+
+use Pes\Validator\Exception\NotValidTypeException;
 /**
  * Description of IsTypeValidator
  *
  * @author pes2704
  */
 class IsObjectTypeValidator implements ValidatorInterface {
-exception
     private $type;
 
     /**
@@ -28,7 +29,9 @@ exception
         }
     }
 
-    public function validate($param) {
-        return $param instanceof $this->type ? TRUE : FALSE;
+    public function validate($param): void {
+        if (!($param instanceof $this->type)) {
+            throw new NotValidTypeException();
+        }
     }
 }

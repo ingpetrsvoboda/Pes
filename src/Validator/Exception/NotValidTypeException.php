@@ -6,13 +6,13 @@
  * and open the template in the editor.
  */
 
-namespace Pes\Acl;
+namespace Pes\Validator\Exception;
 
 /**
+ * Description of NotArrayKeyException
  *
  * @author pes2704
  */
-interface UserGroupsInterface {
-    public function getUser();
-    public function getRoles();
+class NotValidTypeException extends \UnexpectedValueException implements ValidatorExceptionInterface {
+    //put your code here
 }

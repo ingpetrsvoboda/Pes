@@ -20,7 +20,18 @@ namespace Pes\View;
 interface CompositeViewInterface extends ViewInterface {
 
     /**
-     * @return ComposerViewInterface
+     *
+     * @param \Pes\View\ViewInterface $componentView
+     * @param string $name
+     * @return \Pes\View\CompositeViewInterface
      */
     public function appendComponentView(ViewInterface $componentView, $name): CompositeViewInterface ;
+
+
+    /**
+     * Metoda pro přidání komponentních view jako pole nebo \Traversable objekt.
+     * @param iterable $componentViews
+     * @return \Pes\View\CompositeViewInterface
+     */
+    public function appendComponentViews(iterable $componentViews): CompositeViewInterface ;
 }
